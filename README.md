@@ -16,7 +16,11 @@ They'd like a data engineer to create a Postgres database with tables designed t
 
 ## Database Schema
 ### This star schema contains:
+
 ![](Screenshot_2022-02-27_at_10.59.17_AM.png)
+- Stage tables:
+  - staging_events
+  - staging_songs
 - Fact Table
   - songplay
 - Dimension tables:
@@ -27,7 +31,13 @@ They'd like a data engineer to create a Postgres database with tables designed t
 
 
 ## How to run
-1- run **create_tables.py** drops and creates your tables. You run this file to reset your tables before each time you run your ETL scripts.
-2- run **etl.py** reads and processes files from song_data and log_data and loads them into your tables
+1- Edit **dwh.cfg** file and add the credentials of your aws redshift database, staging S3, and ARN (Amazon Resource Name) .
+> **_HINT:_**  
+> * ARN: put the value without any quotes. \
+> example: ARN=your-arn 
 
-If any errors you can run **test.ipynb** displays the first few rows of each table to let you check your database.
+2- run **create_tables.py** drops and creates your tables. You run this file to reset your tables before each time you run your ETL scripts.
+
+3- run **etl.py** reads and processes files from song_data and log_data and loads them into your tables
+
+Kindly note that you have to configure the aws redshift cluster with proper permission and security group .
