@@ -5,7 +5,7 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 def load_staging_tables(cur, conn):
     """
-    Copy Insert each table using the queries in `copy_table_queries` list.
+    Copy and bulk Insert each table using the queries in `copy_table_queries` list.
     """
     for query in copy_table_queries:
         cur.execute(query)
