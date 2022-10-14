@@ -145,7 +145,9 @@ INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_i
                     evnt.location, 
                     evnt.useragent
                  FROM staging_songs as sng 
-                 join staging_events as evnt on sng.artist_name = evnt.artist 
+                 join (SELECT TIMESTAMP 'epoch' + ts/1000 * interval '1 second' AS start_time, *
+                        FROM staging_events
+                        WHERE page='NextSong')  as evnt on sng.artist_name = evnt.artist 
                     AND sng.title = evnt.song AND sng.duration = evnt.length
                  WHERE evnt.page = 'NextSong';
 """)
