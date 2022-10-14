@@ -155,12 +155,13 @@ INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_i
 user_table_insert = ("""
 INSERT INTO users (user_id, first_name, last_name, gender, level)
                  SELECT DISTINCT
-                    user_id,
-                    first_name,
-                    last_name,
+                    userId,
+                    firstName,
+                    lastname,
                     gender,
                     level                    
-                 FROM staging_songs;
+                 FROM staging_events
+                 WHERE userId IS NOT NULL;
 """)
 
 song_table_insert = ("""
