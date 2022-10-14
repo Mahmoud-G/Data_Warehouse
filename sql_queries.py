@@ -124,25 +124,29 @@ staging_events_copy = ("""
 """).format(config.get('S3', 'LOG_DATA'), DWH_ROLE_ARN, config.get('S3', 'LOG_JSONPATH'))
 
 staging_songs_copy = ("""
-COPY staging_songs
-FROM {}
-credentials 'aws_iam_role={}'
-region 'us-west-2'
-FORMAT AS JSON 'auto';
+    COPY staging_songs
+    FROM {}
+    credentials 'aws_iam_role={}'
+    region 'us-west-2'
+    FORMAT AS JSON 'auto';
 """).format(config['S3']['SONG_DATA'], DWH_ROLE_ARN)
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
 INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
-                 SELECT DISTINCT
-                    artist_id,
-                    artist_name,
-                    artist_location,
-                    artist_latitude,
-                    artist_longitude                    
+                 SELECT 
+                    evnt.start_time, 
+                    evnt.userid, 
+                    evnt.level, 
+                    sng.song_id, 
+                    sng.artist_id, 
+                    evnt.sessionid, 
+                    evnt.location, 
+                    evnt.useragent
                  FROM staging_songs as sng 
-                 join staging_events as evnt on sng.artist_name = evnt.artist
+                 join staging_events as evnt on sng.artist_name = evnt.artist 
+                    AND sng.title = evnt.song AND sng.duration = evnt.length
                  WHERE evnt.page = 'NextSong';
 """)
 
@@ -182,7 +186,7 @@ INSERT INTO artists (artist_id, name, location, latitude, longitude)
 time_table_insert = ("""
 INSERT INTO time (start_time, hour, day, week, month, year, weekday)
     SELECT DISTINCT
-        (TO_CHAR(start_time :: DATE, 'yyyyMMDD')::integer)        AS start_time,
+        TIMESTAMP 'epoch' + ts/1000 * interval '1 second'          AS start_time,
         EXTRACT(hour FROM start_time)                              AS hour,
         EXTRACT(day FROM start_time)                               AS day,
         EXTRACT(week FROM start_time)                              AS week,
